@@ -2,6 +2,7 @@ package com.example.kotlincoroutine
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
@@ -20,7 +21,8 @@ class MainActivity : AppCompatActivity() {
                 .getRetrofitInstance()
                 .create(AlbumService::class.java)
 
-        getRequestWithQueryParameters()
+//        getRequestWithQueryParameters()
+        getRequestWithPathParameters()
     }
 
     private fun getRequestWithQueryParameters() {
@@ -39,6 +41,19 @@ class MainActivity : AppCompatActivity() {
                     text_view.append(result)
                 }
             }
+        })
+    }
+
+    private fun getRequestWithPathParameters() {
+        val pathResponse: LiveData<Response<AlbumsItem>> = liveData {
+            val response = retService.getAlbum(3)
+            emit(response)
+
+        }
+
+        pathResponse.observe(this, Observer {
+            val title = it.body()?.title
+            Toast.makeText(applicationContext, title, Toast.LENGTH_LONG).show()
         })
     }
 }
