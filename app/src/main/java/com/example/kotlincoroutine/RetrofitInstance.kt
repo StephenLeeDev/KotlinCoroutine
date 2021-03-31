@@ -26,5 +26,13 @@ class RetrofitInstance {
                     .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
                     .build()
         }
+        val BASE_URL2: String = "https://yts-proxy.now.sh/list_movies.json?sort_by=rating"
+        fun getRetrofitInstance2(): Retrofit {
+            return Retrofit.Builder()
+                    .baseUrl(BASE_URL2)
+                    .client(client)
+                    .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+                    .build()
+        }
     }
 }

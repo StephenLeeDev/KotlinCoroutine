@@ -12,6 +12,7 @@ import retrofit2.Response
 class MainActivity : AppCompatActivity() {
 
     private lateinit var retService: AlbumService
+    private lateinit var movieService: MovieService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,8 +22,16 @@ class MainActivity : AppCompatActivity() {
                 .getRetrofitInstance()
                 .create(AlbumService::class.java)
 
-//        getRequestWithQueryParameters()
-        getRequestWithPathParameters()
+        getRequestWithQueryParameters()
+//        getRequestWithPathParameters()
+//        uploadAlbum()
+
+        movieService = RetrofitInstance
+                .getRetrofitInstance()
+                .create(MovieService::class.java)
+
+//        getMovies()
+
     }
 
     private fun getRequestWithQueryParameters() {
@@ -48,12 +57,46 @@ class MainActivity : AppCompatActivity() {
         val pathResponse: LiveData<Response<AlbumsItem>> = liveData {
             val response = retService.getAlbum(3)
             emit(response)
-
         }
 
         pathResponse.observe(this, Observer {
             val title = it.body()?.title
             Toast.makeText(applicationContext, title, Toast.LENGTH_LONG).show()
+        })
+    }
+
+    private fun uploadAlbum() {
+        val album = AlbumsItem(0, "My title", 3)
+        val postResponse: LiveData<Response<AlbumsItem>> = liveData {
+            val response = retService.uploadAlbum(album)
+            emit(response)
+        }
+        postResponse.observe(this, Observer {
+            val receivedAlbumsItem = it.body()
+            val result = " " + "Album Title : ${receivedAlbumsItem?.title}" + "\n" +
+                    " " + "Album id : ${receivedAlbumsItem?.id}" + "\n" +
+                    " " + "User id : ${receivedAlbumsItem?.userId}" + "\n\n\n"
+            text_view.text = result
+        })
+
+    }
+
+    private fun getMovies() {
+        val responseLiveData: LiveData<Response<Movies>> = liveData {
+            val response = movieService.getMovies()
+            emit(response)
+        }
+        responseLiveData.observe(this, Observer {
+            val movieList = it.body()?.listIterator()
+            if (movieList != null) {
+                while (movieList.hasNext()) {
+                    val movieItem = movieList.next()
+                    val result = " " + "Album Title : ${movieItem.id}" + "\n" +
+                            " " + "Album id : ${movieItem.title}" + "\n" +
+                            " " + "User id : ${movieItem.language}" + "\n\n\n"
+                    text_view.append(result)
+                }
+            }
         })
     }
 }
